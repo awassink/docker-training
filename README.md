@@ -66,11 +66,14 @@ the application can connect to mysql by using the link option: --link cddb_mysql
 
 Step 3. Create an Docker image of the Angular web app
 
-The web application is a simple Angular application compising only of static files to be served. This can be done easily using nginx. To make the
-REST endpoints easily accessible form the browser an nginx configuration is provided (nginx.conf) to create a reverse proxy that proxies the
-REST backend service. Therefor link the cddb_backend container to cddb_backend so the nginx reverse proxy can connect to the Java
+The web application is a simple Angular application compising only of static files to be served. This can be done easily using nginx and copy the webapp content.
+COPY ./ /usr/share/nginx/html
+To make the REST endpoints easily accessible form the browser an nginx configuration is provided (nginx.conf) to create a reverse proxy that proxies the
+REST backend service.
+COPY nginx.conf /etc/nginx/
+Therefor also link the cddb_backend container to cddb_backend so the nginx reverse proxy can connect to the Java
 backendby using the link option: --link cddb_backend:cddb_backend. Bind the nginx port (80) to a local port and check that the web application is available and working using a browser (http://<dockerhost>:
-<bindport>/cddb/rest/).
+<bindport>/).
 
 (Optional) Step 4.
 
