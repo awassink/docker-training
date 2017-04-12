@@ -58,7 +58,9 @@ mysql port (3306) to a local port and check that the database is available.
 Step 2. Create an docker image of the Java REST service
 
 The Java REST service is a simple JavaEE web app that is ready available in the three-tier-app/backend folder. This WAR file can be run with
-tomcat 8.5, so create a Docker image based on https://hub.docker.com/_/tomcat/ using a Docker file. Link the cddb_mysql container to mysql so
+tomcat 8.5, so create a Docker image based on https://hub.docker.com/_/tomcat/ using a Docker file. Copy the war file to /usr/local/tomcat/webapps/cddb.war in the image.
+
+Link the cddb_mysql container to mysql so
 the application can connect to mysql. Give the backend container the name cddb_backend so it can be linked later on. Bind the tomcat port
 (8080) to a local port and check that the REST service is available using a browser or other tool (http://<dockerhost>:<bindport>/cddb/rest/).
 
