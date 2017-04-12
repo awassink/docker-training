@@ -45,9 +45,13 @@ REST service upon startup, and the database can be created by the docker image i
 
 Step 1. Run MySQL
 
-The Java REST service expects a mysql database with the name cddb_quintor and a user with the same name and quintor_pw as password. Use
-the standard version 5.6 mysql image from Docker hub (https://hub.docker.com/_/mysql/) for this. There are environment variables available to let
-the mysql docker container create the database and an user. Give the mysql container the name cddb_mysql so it can be linked later on. Bind the
+The Java REST service expects a mysql database with the name cddb_quintor and a user with the same name and quintor_pw as password.
+
+MYSQL_DATABASE=cddb_quintor
+MYSQL_USER=cddb_quintor
+MYSQL_PASSWORD=quintor_pw
+
+Use the standard version 5.6 mysql image from Docker hub (https://hub.docker.com/_/mysql/) for this. There are environment variables available to let the mysql docker container create the database and an user. Give the mysql container the name cddb_mysql so it can be linked later on. Bind the
 mysql port (3306) to a local port and check that the database is available.
 
 Step 2. Create an docker image of the Java REST service
