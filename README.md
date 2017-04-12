@@ -61,7 +61,7 @@ The Java REST service is a simple JavaEE web app that is ready available in the 
 tomcat 8.5, so create a Docker image based on https://hub.docker.com/_/tomcat/ using a Docker file. Copy the war file to /usr/local/tomcat/webapps/cddb.war in the image.
 
 Link the cddb_mysql container to mysql so
-the application can connect to mysql by using the link option: --link cddb_mysql:cddb_mysql. Give the backend container the name cddb_backend so it can be linked later on. Bind the tomcat port
+the application can connect to mysql by using the link option: --link cddb_mysql:mysql. Give the backend container the name cddb_backend so it can be linked later on. Bind the tomcat port
 (8080) to a local port and check that the REST service is available using a browser or other tool (http://<dockerhost>:<bindport>/cddb/rest/).
 
 Step 3. Create an Docker image of the Angular web app
