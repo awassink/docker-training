@@ -47,6 +47,7 @@ Step 1. Run MySQL
 
 The Java REST service expects a mysql database with the name cddb_quintor and a user with the same name and quintor_pw as password.
 
+MYSQL_ROOT_PASSWORD=quintor_pw
 MYSQL_DATABASE=cddb_quintor
 MYSQL_USER=cddb_quintor
 MYSQL_PASSWORD=quintor_pw
