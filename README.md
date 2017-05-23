@@ -75,12 +75,12 @@ Therefor also link the cddb_backend container to cddb_backend so the nginx rever
 backendby using the link option: --link cddb_backend:cddb_backend. Bind the nginx port (80) to a local port and check that the web application is available and working using a browser (http://<dockerhost>:
 <bindport>/).
 
-(Optional) Step 4.
+Step 4.
 
 Use volume mounting to store the mysql data locally. After removing the mysql container the stored data should be available again when a new
 container is create with the same volume mount.
 
-(Optional) Use Docker Compose to run the three tier application at once
+Use Docker Compose to run the three tier application at once
 
 Docker compose give you the possibility to run multiple containers that are depended on each other at once. Command line options that are
 needed to link containers, mount volumes and expose ports can be defined is one configuation file.
