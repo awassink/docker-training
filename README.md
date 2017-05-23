@@ -1,6 +1,6 @@
 # docker-training
 
-## Part 1 - Working with containers
+## Exersise 1 - Working with containers
 
 Apply the following docker actions to learn the basics with docker.
 
@@ -36,7 +36,7 @@ Apply the following docker actions to learn the basics with docker.
            case you can use “ro” for mountoptions, so it’s read-only. Use /usr/share/nginx/html as guestfolder for nginx. Do NOT use relative paths.
            Check the webpage with the browser.
 
-## Part 2 - Creating images
+## Exersise 2 - Creating images
 
 In this part of the workshop we will be deploying a three tier application that comprises of a web server hosting an angular web application, a Java
 based REST service and a mysql database. In this part of the workshop we will create a Docker image for the frontend and backend layer. There
@@ -80,7 +80,7 @@ Step 4.
 Use volume mounting to store the mysql data locally. After removing the mysql container the stored data should be available again when a 
 container is create with the same volume mount.
 
-## Part 3 - Use Docker Compose to run the three tier application at once
+## Exersise 3 - Use Docker Compose to run the three tier application at once
 
 Docker compose give you the possibility to run multiple containers that are depended on each other at once. Command line options that are
 needed to link containers, mount volumes and expose ports can be defined is one configuation file.
