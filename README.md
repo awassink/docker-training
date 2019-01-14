@@ -1,27 +1,59 @@
 # docker-training
 
+## Prerequisites
+
+Install Docker (Community Edition) on your system, if not present already <https://docs.docker.com/install/>. Check that `docker version` is returning a proper result for both the client and server.
+
+Install Docker Compose on your system, if not present already <https://docs.docker.com/compose/install/>. Check that `docker-compose version` is returning a proper result.
+
+Install the Dive tool for exploring Docker images and layers <https://github.com/wagoodman/dive>.
+
 ## Exersise 1 - Working with containers
 
-Apply the following docker actions to learn the basics with docker.
+### The basics commands to start with
+Open a shell session on your system and see that`docker help` and `docker <cmd> help` are your friend. 
+They display information about the possibilities of docker. 
+Important commands are `docker images` to get a list with the current images, `docker ps` to get a list with de current active containers and `docker ps -a` to get a list with all the containers including the inactive. 
+When you've never run a Docker container before the resulted list of previous commands will be empty. 
+Let's change that now
 
-1. Use `docker help` and `docker <cmd> help` for information about the possibilities of docker. Important commands are `docker images` to get a list with the current images, `docker ps` to get a list with de current active containers and `docker ps -a` to get a list with all the containers including the inactive.
+### Starting a container
+Use `docker run` to start a container from the nginx image, a webserver, and make it available at port 88.
+Note that the first time you'll start a container Docker will download the needed Docker image from the Docker repository.
+You need the flag `-d` to run the server as deamon (the command prompt becomes unresponsive) and the flag `-p hostport:guestport` for port mapping. 
+Nginx within the container serves at port 80.
+Use `—name` to give your container a manageable name instead of a random ID. 
+Use a browser to access the nginx webserver `http://<dockerhost>:88/` and see the default web page being served.
 
-2. Use `docker run` to start a container from image nginx and make it available at port 88. Check if the container is running by retrieving the website in your browser. You need the flag `-d` to run the server as deamon (the command prompt becomes unresponsive) and the flag `-p hostport:guestport` for port mapping. Nginx serves at port 80. Use `—name` to give your container a manageable name instead of a random ID. Use a browser to access the nginx webserver `http://<dockerhost>:88/`.
+### Looking inside a container
+By default you have no insight in what is happening inside a container. 
+But you are able to execute commands inside a running container. 
+Now use `docker exec -ti <container-id> bash` to open a shell in the active container. 
+Check the filesystem with `ls`, with `ps -ef` the active processes, with `hostname` the hostname and with `hostname -i` the assigned ip-address of the container. (end shell with `exit`)
 
-3. Use `docker exec -ti <container-id> bash` to open a shell in the active container. Check the filesystem with `ls`, with `ps -ef` the active processes, with `hostname` the hostname and with `hostname -i` the assigned ip-address of the container. (end shell with `exit`)
+### Stopping and restarting a container
+Stop the docker container with `docker stop`. Make sure that the webpage is not available any more.
+With `docker ps -a` you can see all the containers and their status.
+Every time you execute `docker run` a new container gets created. 
+After a run you can run the same container with the assigned name (`docker start name`) to prevent the creation of a huge amount of containers. 
+With the flag `-d` the container runs as a deamon and you need to stop it explicitly. 
+Restart the container now.
 
-4. Stop the docker container with `docker stop`. Make sure that the webpage is not available.
-5. With `docker ps -a` you can see the containers (active and not active).
-6. Every time you execute `docker run` a new container gets created. After a run you can run the same container with the assigned name (`docker start name`) to prevent the creation of a huge amount of containers. With the flag `-d` the container runs as a deamon and you need to stop it explicitly. Restart the container now.
+### Removing containers and images
+Remove the previously started docker container with `docker rm`. 
+Use the `-f` flag if the container is still running.
+Remove the nginx image with `docker rmi`. 
+This only works if the containers based on the image are removed. 
+If this is not the case, use `docker ps -a` and `docker rm` to remove the remaining.
 
-7. Check the local available docker images with `docker images`.
-8. Check the image layering with `docker history`.
-9. Remove the previously started docker container with `docker rm`. Use the `-f` flag if the container is still running.
-10. Remove the nginx image with `docker rmi`. This only works if the containers based on the image are removed. If this is not the case, use `docker ps -a` and `docker rm` to remove the remaining.
+### Volume mounting
+We are going to do something more exiting, we are going to serve our own (static) webpage `<project-directory>/web-app/src` from the nginx container. 
+Start a new container with a port mapping and a mount to `/usr/share/nginx/html/` using `-v hostfolder:guestfolder:mountoptions`. 
+In this case you can use `ro` for mountoptions, so it’s read-only. 
+Use `/usr/share/nginx/html` as guestfolder (default webcontent directory of nginx) and `<project-directory>/web-app/src` as hostfolder. 
+Note not to use relative paths.
+Check the webpage with the browser.
 
-11. We are going to do something more exiting, we are going to serve our own (static) webpage from the nginx container. Get the static pages from `/web-app/static_webpage.zip`. We need a new container, so we use `docker run`. Unzip `static_webpage.zip` to a location of your choice, for example `/tmp/webpage1/`.
-
-12. Start a new container with a port mapping and a mount to `/usr/share/nginx/html/` use `-v hostfolder:guestfolder:mountoptions`. In this case you can use `ro` for mountoptions, so it’s read-only. Use `/usr/share/nginx/html` as guestfolder for nginx. Do NOT use relative paths. Check the webpage with the browser.
 
 ## Exersise 2 - Creating images
 
