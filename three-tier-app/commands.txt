@@ -1,0 +1,7 @@
+docker run -d -p 23306:3306 -e MYSQL_ROOT_PASSWORD=quintor_pw -e MYSQL_DATABASE=cddb_quintor -e MYSQL_USER=cddb_quintor -e MYSQL_PASSWORD=quintor_pw --name cddb_mysql mysql:5.6
+
+docker run -d -p 28080:8080 --link cddb_mysql:mysql --name cddb_backend cddb_backend
+
+docker run -d -p 20080:80 --link cddb_backend:cddb_backend --name cddb_frontend cddb_frontend
+
+docker run -d -p 23306:3306 -e MYSQL_ROOT_PASSWORD=quintor_pw -e MYSQL_DATABASE=cddb_quintor -e MYSQL_USER=cddb_quintor -e MYSQL_PASSWORD=quintor_pw -v /tmp/mysql:/var/lib/mysql:rw --name cddb_mysql mysql:5.6
