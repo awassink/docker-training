@@ -11,24 +11,24 @@ Install the Dive tool for exploring Docker images and layers <https://github.com
 ## Exersise 1 - Working with containers
 
 ### The basics commands to start with
-Open a shell session on your system and see that`docker help` and `docker <cmd> help` are your friend. 
+Open a shell session on your system and see that`docker help` and `docker help <cmd>` are your friend. 
 They display information about the possibilities of docker. 
 Important commands are `docker images` to get a list with the current images, `docker ps` to get a list with de current active containers and `docker ps -a` to get a list with all the containers including the inactive. 
 When you've never run a Docker container before the resulted list of previous commands will be empty. 
 Let's change that now
 
 ### Starting a container
-Use `docker run` to start a container from the nginx image, a webserver, and make it available at port 88.
+Use `docker run` to start a container from the `nginx:alpine` image, a webserver, and make it available at port 88.
 Note that the first time you'll start a container Docker will download the needed Docker image from the Docker repository.
 You need the flag `-d` to run the server as deamon (the command prompt becomes unresponsive) and the flag `-p hostport:guestport` for port mapping. 
 Nginx within the container serves at port 80.
-Use `—name` to give your container a manageable name instead of a random ID. 
-Use a browser to access the nginx webserver `http://<dockerhost>:88/` and see the default web page being served.
+Use `—-name` to give your container a manageable name instead of a random ID. 
+Use a browser to access the nginx webserver `http://localhost:88/` and see the default web page being served.
 
 ### Looking inside a container
 By default you have no insight in what is happening inside a container. 
 But you are able to execute commands inside a running container. 
-Now use `docker exec -ti <container-id> bash` to open a shell in the active container. 
+Now use `docker exec -ti <container-id> sh` to open a shell in the active container. 
 Check the filesystem with `ls`, with `ps -ef` the active processes, with `hostname` the hostname and with `hostname -i` the assigned ip-address of the container. (end shell with `exit`)
 
 ### Stopping and restarting a container
@@ -54,42 +54,69 @@ Use `/usr/share/nginx/html` as guestfolder (default webcontent directory of ngin
 Note not to use relative paths.
 Check the webpage with the browser.
 
+### Explore the Dokcer image and its layers
+With `dive` we can have a look into Docker images and how they are build up.
+Now start exploring the NGINX image, `dive nginx:alpine`, and browse through the image layers and have a look at the changes made in each layer to the filesystem.
 
-## Exersise 2 - Creating images
 
-In this part of the workshop we will be deploying a three tier application that comprises of a web server hosting an angular web application, a Java based REST service and a mysql database. In this part of the workshop we will create a Docker image for the frontend and backend layer. There is no dedicated Docker image for de database layer needed as the database tables of the application will be created by the hibernate layer of the REST service upon startup, and the database can be created by the docker image it self.
+## Exersise 2 - Creating images and linking containers
+In this part of the workshop we will be deploying a three tier application that comprises of a web server hosting an angular web application, a Java based REST service and a mysql database. 
+For that we will create a Docker image for the frontend and backend layer. 
+There is no dedicated Docker image for de database layer needed as the database tables of the application will be created by the hibernate layer of the REST service upon startup, and the database can be created by the docker image it self.
+Lets get started!
 
-Step 1. Run MySQL
-
+### Run MySQL
 The Java REST service expects a mysql database with the name `cddb_quintor` and a user with the same name and `quintor_pw` as password.
 
-`MYSQL_ROOT_PASSWORD=quintor_pw
-MYSQL_DATABASE=cddb_quintor
-MYSQL_USER=cddb_quintor
-MYSQL_PASSWORD=quintor_pw`
+Use the standard version 5.6 mysql image from Docker hub <https://hub.docker.com/_/mysql/> for this. 
+There are environment variables available to let the mysql docker container create the database and an user. 
+Use the option `-e` of the `docker run` command to specify these. 
+- `MYSQL_ROOT_PASSWORD=quintor_pw`
+- `MYSQL_DATABASE=cddb_quintor`
+- `MYSQL_USER=cddb_quintor`
+- `MYSQL_PASSWORD=quintor_pw`
 
-Use the standard version 5.6 mysql image from Docker hub (https://hub.docker.com/_/mysql/) for this. There are environment variables available to let the mysql docker container create the database and an user. Give the mysql container the name `cddb_mysql` so it can be linked later on. Bind the mysql port (3306) to a local port and check that the database is available.
+Give the mysql container the name of `cddb_mysql` so it can be linked later on. 
+Bind the mysql port `3306` to a local port (e.g. `23306`) and check that the database is available using a SQL client.
 
-Step 2. Create an docker image of the Java REST service
+### Create a docker image of the Java REST service
+The Java REST service is a simple JavaEE web app that is available in the `three-tier-app/backend` folder. 
+The WAR-file in the `target` folder can be run with tomcat 8.5, so create a Docker image based on <https://hub.docker.com/_/tomcat/> using a Dockerfile. 
+In de Dockerfile specify to copy the war file to `/usr/local/tomcat/webapps/cddb.war` in the image.
+Now build the Docker image using `docker build` and tag the created image using `docker tag`.
 
-The Java REST service is a simple JavaEE web app that is ready available in the three-tier-app/backend folder. This WAR file can be run with tomcat 8.5, so create a Docker image based on https://hub.docker.com/_/tomcat/ using a Docker file. Copy the war file to `/usr/local/tomcat/webapps/cddb.war` in the image.
+### Run the Java REST service
+By default the backend container won't know where to connect to the mysql container, but we are able to specify that with linking. 
+Link the `cddb_mysql` container to `mysql` so the application can connect to mysql, using the link option: `--link cddb_mysql:mysql`. 
+Give the backend container the name `cddb_backend` so it can be linked later on. 
+Bind the tomcat port `8080` to a local port (e.g. `28080`) and check that the REST service is available using a browser or other tool <http://localhost:28080/cddb/rest/>.
 
-Link the `cddb_mysql` container to mysql so the application can connect to mysql by using the link option: `--link cddb_mysql:mysql`. Give the backend container the name `cddb_backend` so it can be linked later on. Bind the tomcat port (8080) to a local port and check that the REST service is available using a browser or other tool `http://<dockerhost>:<bindport>/cddb/rest/`.
+### Create a Docker image of the Angular web app
+The web application is a simple Angular application comprising only of static files to be served. 
+This can be done easily using a nginx image with copied webapp content, so create a Docker image based on <https://hub.docker.com/_/nginx/> using a Dockerfile.
+In de Dockerfile specify to copy the `frontend/src` to `/usr/share/nginx/html` in the image.
+To make the REST endpoints easily accessible from the browser an nginx configuration is provided `frontend/resources/nginx.conf` to create a reverse proxy that proxies the REST calls to the backend service.
+In de Dockerfile specify to copy the `nginx.conf` to `/usr/share/nginx/html` in the image.
+Now build the Docker image using `docker build` and tag the created image using `docker tag`.
 
-Step 3. Create an Docker image of the Angular web app
+### Run the Angular web app
+Link the `cddb_backend` container to `cddb_backend` so the nginx reverse proxy can connect to the Java backend by using the `--link` option. 
+Bind the nginx http port `80` to a local port (e.g. `20080`) and check that the web application is available and working using a browser <http://localhost:20080/>.
 
-The web application is a simple Angular application compising only of static files to be served. This can be done easily using nginx and copy the webapp content.
-`COPY ./ /usr/share/nginx/html`
-To make the REST endpoints easily accessible form the browser an nginx configuration is provided (`nginx.conf`) to create a reverse proxy that proxies the REST backend service.
-`COPY nginx.conf /etc/nginx/`
-Therefor also link the `cddb_backend` container to `cddb_backend` so the nginx reverse proxy can connect to the Java backendby using the link option: `--link cddb_backend:cddb_backend`. Bind the nginx port (80) to a local port and check that the web application is available and working using a browser `http://<dockerhost>:<bindport>/`.
-
-Step 4.
-
-Use volume mounting to store the mysql data locally. After removing the mysql container the stored data should be available again when a container is create with the same volume mount.
+### Store the database files on the host system
+By default the data written by processes in a container wil end up in the writable layer of the container.
+This is fine as long as the container exists and the data is transient, but in case of our mysql database we want to keep our data longer than the lifetime of the container!
+We can achieve this by mounting a host folder location in the container using the `-v` option.
+Stop and remove the existing mysql database container.
+Run the mysql container now with volume mounting to store the mysql data locally (guestfolder: `/var/lib/mysql`). 
+After entering some data in the application: remove the mysql container. 
+The stored data should be available again when the container is created with the same volume mount.
 
 ## Exersise 3 - Use Docker Compose to run the three tier application at once
+In exersise 2 we were able to run the three tier application using three quite large `docker run` commands.
+Wouldn't it be nice to do that more easily?
+Docker Compose give you the possibility to run multiple containers that are depended on each other with all there options at once. 
+Command line options that are needed to link containers, mount volumes and expose ports can be defined is one configuation file: `docker-compose.yaml`.
 
-Docker compose give you the possibility to run multiple containers that are depended on each other at once. Command line options that are needed to link containers, mount volumes and expose ports can be defined is one configuation file.
-
-Create a docker compose yaml configuration file to start up the three tier application at once. Documentation can be found here: https://docs.docker.com/compose/overview/
+Create a `docker-compose.yaml` configuration file to start up the three tier application at once. 
+Documentation can be found at <https://docs.docker.com/compose/overview/>
