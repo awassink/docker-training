@@ -53,6 +53,7 @@ In this case you can use `ro` for mountoptions, so it’s read-only.
 Use `/usr/share/nginx/html` as guestfolder (default webcontent directory of nginx) and `<project-directory>/web-app/src` as hostfolder. 
 Note not to use relative paths.
 Check the webpage with the browser.
+If you change the text in the index.html file this change will directly be visible when you refresh the page in the browser.
 
 ### Explore the Dokcer image and its layers
 With `dive` we can have a look into Docker images and how they are build up.
@@ -89,7 +90,9 @@ Now build the Docker image using `docker build` and tag the created image using 
 By default the backend container won't know where to connect to the mysql container, but we are able to specify that with linking. 
 Link the `cddb_mysql` container to `mysql` so the application can connect to mysql, using the link option: `--link cddb_mysql:mysql`. 
 Give the backend container the name `cddb_backend` so it can be linked later on. 
-Bind the tomcat port `8080` to a local port (e.g. `28080`) and check that the REST service is available using a browser or other tool <http://localhost:28080/cddb/rest/>.
+Bind the tomcat port `8080` to a local port (e.g. `28080`). 
+Check with `docker logs` that the service started without errors and check that the REST service is available using a browser or other tool <http://localhost:28080/cddb/rest/>.
+You should also see that the database tables of the application are created.
 
 ### Create a Docker image of the Angular web app
 The web application is a simple Angular application comprising only of static files to be served. 
@@ -109,8 +112,10 @@ This is fine as long as the container exists and the data is transient, but in c
 We can achieve this by mounting a host folder location in the container using the `-v` option.
 Stop and remove the existing mysql database container.
 Run the mysql container now with volume mounting to store the mysql data locally (guestfolder: `/var/lib/mysql`). 
+Look at the folder on the host system and see that mysql is writing it's database files there.
+Note: to recreate the database remove the backend container and run it again.
 After entering some data in the application: remove the mysql container. 
-The stored data should be available again when the container is created with the same volume mount.
+The stored data should be available again when the container is created again with the same volume mount.
 
 ## Exersise 3 - Use Docker Compose to run the three tier application at once
 In exersise 2 we were able to run the three tier application using three quite large `docker run` commands.
