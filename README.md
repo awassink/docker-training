@@ -125,3 +125,6 @@ Command line options that are needed to link containers, mount volumes and expos
 
 Create a `docker-compose.yaml` configuration file to start up the three tier application at once. 
 Documentation can be found at <https://docs.docker.com/compose/overview/>
+Note that the first time the mysql container is started it take more time, because the database files need to be created.
+This time is longer that the backend takes to startup, which fails because mysql is not yet available.
+Restarting the compose setup should fix this issue.
