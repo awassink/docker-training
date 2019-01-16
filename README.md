@@ -99,7 +99,7 @@ The web application is a simple Angular application comprising only of static fi
 This can be done easily using a nginx image with copied webapp content, so create a Docker image based on <https://hub.docker.com/_/nginx/> using a Dockerfile.
 In de Dockerfile specify to copy the `frontend/src` to `/usr/share/nginx/html` in the image.
 To make the REST endpoints easily accessible from the browser an nginx configuration is provided `frontend/resources/nginx.conf` to create a reverse proxy that proxies the REST calls to the backend service.
-In de Dockerfile specify to copy the `nginx.conf` to `/usr/share/nginx/html` in the image.
+In de Dockerfile specify to copy the `nginx.conf` to `/etc/nginx/` in the image.
 Now build the Docker image using `docker build` and tag the created image using `docker tag`.
 
 ### Run the Angular web app
